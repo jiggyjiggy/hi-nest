@@ -1,5 +1,6 @@
 import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+import exp from 'constants';
 import { MoviesService } from './movies.service';
 
 describe('MoviesService', () => {
@@ -42,6 +43,41 @@ describe('MoviesService', () => {
         expect(e).toBeInstanceOf(NotFoundException);
         expect(e.message).toEqual("Movie with ID 999 not found")
       }
+    })
+  })
+
+  describe("deleteOne", () => {
+    it("delete a movie", () => {
+        service.create({
+          title:"Test Movie",
+          genres: ["test"],
+          year: 2000,
+        });
+        const allMovies = service.getAll() ;
+        service.deleteOne(1)
+        const afterDelete = service.getAll();
+
+        expect(afterDelete.length).toEqual(allMovies.length - 1);
+    });
+    it("should return a 404", () => {
+      try {
+        service.deleteOne(999);
+      } catch(e) {
+        expect(e).toBeInstanceOf(NotFoundException);
+      }
+    })
+  });
+
+  describe("create", () => {
+    it("should create a movie", () => {
+      const beforeCreate = service.getAll().length;
+      service.create({
+        title:"Test Movie",
+        genres: ["test"],
+        year: 2000,
+      });
+      const afterCreate = service.getAll().length;
+      expect(afterCreate).toBeGreaterThan(beforeCreate);
     })
   })
 });
